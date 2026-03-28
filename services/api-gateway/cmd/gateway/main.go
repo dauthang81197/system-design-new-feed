@@ -2,6 +2,7 @@ package main
 
 import (
 	"api-gateway/internal/config"
+	"api-gateway/internal/proxy"
 	"context"
 	"log"
 	"net/http"
@@ -25,7 +26,7 @@ func main() {
 	})
 
 	// --- 14 placeholder routes ---
-	registerRoutes(r)
+	registerRoutes(r, cfg)
 
 	server := &http.Server{
 		Addr:    ":" + cfg.Port,
@@ -57,23 +58,47 @@ func main() {
 	log.Println("Server exited.")
 }
 
-func registerRoutes(r *chi.Mux) {
+func registerRoutes(r *chi.Mux, cfg *config.Config) {
+
+	// --- Reverse Proxy Phase 2 ---
+	authProxy := proxy.NewReverseProxy(cfg.AuthServiceURL, "/auth")
+	postsProxy := proxy.NewReverseProxy(cfg.PostsServiceURL, "/posts")
+	followProxy := proxy.NewReverseProxy(cfg.FollowServiceURL, "/follow")
+	newsfeedProxy := proxy.NewReverseProxy(cfg.NewsfeedServiceURL, "/newsfeed")
+
+	r.Route("/auth", func(r chi.Router) {
+		r.Handle("/*", authProxy)
+	})
+
+	r.Route("/posts", func(r chi.Router) {
+		r.Handle("/*", postsProxy)
+	})
+
+	r.Route("/follow", func(r chi.Router) {
+		r.Handle("/*", followProxy)
+	})
+
+	r.Route("/newsfeed", func(r chi.Router) {
+		r.Handle("/*", newsfeedProxy)
+	})
+
+	// --- 14 placeholder routes ---
 	r.Get("/users", placeholder)
 	r.Get("/users/{id}", placeholder)
 	r.Post("/users", placeholder)
 
 	r.Post("/auth/login", placeholder)
+	r.Post("/auth/login", placeholder)
 	r.Post("/auth/register", placeholder)
 	r.Post("/auth/refresh", placeholder)
 
-	r.Get("/orders", placeholder)
+	r.Get("/posts", placeholder)
 	r.Post("/orders", placeholder)
 	r.Get("/orders/{id}", placeholder)
 
 	r.Get("/payments", placeholder)
 	r.Post("/payments", placeholder)
 
-	// thêm routes để đủ 14
 	r.Get("/products", placeholder)
 	r.Get("/products/{id}", placeholder)
 	r.Post("/products", placeholder)
