@@ -10,20 +10,23 @@ import (
 type Config struct {
 	Port            string
 	JWTAccessSecret string
-	UserServiceURL  string
-	OrderServiceURL string
-	PaymentURL      string
+
+	AuthServiceURL     string
+	PostsServiceURL    string
+	FollowServiceURL   string
+	NewsfeedServiceURL string
 }
 
 func Load() *Config {
 	_ = godotenv.Load()
 
 	cfg := &Config{
-		Port:            getEnv("PORT", "3000"),
-		JWTAccessSecret: getEnv("JWT_ACCESS_SECRET", "secret"),
-		UserServiceURL:  getEnv("USER_SERVICE_URL", "http://localhost:4001"),
-		OrderServiceURL: getEnv("ORDER_SERVICE_URL", "http://localhost:4002"),
-		PaymentURL:      getEnv("PAYMENT_URL", "http://localhost:4003"),
+		Port:               getEnv("PORT", "4000"),
+		JWTAccessSecret:    getEnv("JWT_ACCESS_SECRET", "secret"),
+		AuthServiceURL:     getEnv("AUTH_SERVICE_URL", "http://localhost:4001"),
+		PostsServiceURL:    getEnv("POST_SERVICE_URL", "http://localhost:4002"),
+		FollowServiceURL:   getEnv("FOLLOW_SERVICE_URL", "http://localhost:4003"),
+		NewsfeedServiceURL: getEnv("NEWS_FEED_SERVICE_URL", "http://localhost:4004"),
 	}
 
 	log.Printf("Config loaded: PORT=%s", cfg.Port)
