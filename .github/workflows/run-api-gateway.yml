@@ -2,10 +2,19 @@ name: API Gateway CI/CD
 
 on:
   push:
+    branches:
+      - develop
+    paths:
+      - "services/api-gateway/**"
+  pull_request:
+    branches:
+      - develop
     paths:
       - "services/api-gateway/**"
 
 jobs:
   run_api_gateway:
     uses: dauthang81197/system-design-new-feed/.github/workflows/api-gateway.yml@develop
+    with:
+      is_deploy: ${{ github.event_name == 'push' }}
     secrets: inherit
