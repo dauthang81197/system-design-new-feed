@@ -8,54 +8,64 @@ jobs:
     runs-on: self-hosted
 
     steps:
-      # Source code
       - name: Checkout code
         uses: actions/checkout@v3
 
-      # Install Go
       - name: Set up Go
         uses: actions/setup-go@v4
         with:
           go-version: '1.22'
 
-      # Build binary
       - name: Build Go binary
         run: |
           cd services/api-gateway
           go mod tidy
-          go build -o api-gateway .
+          go build -o api-gateway ./cmd/gateway
 
-      # Login Docker Hub
       - name: Login to Docker Hub
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-      # Build Docker image
       - name: Build Docker image
         run: |
           docker build \
             -t ${{ secrets.DOCKER_USERNAME }}/api-gateway:latest \
+            -t ${{ secrets.DOCKER_USERNAME }}/api-gateway:${{ github.sha }} \
             ./services/api-gateway
 
-      # Push lên Docker Hub
-      - name: Push image
-        run: docker push ${{ secrets.DOCKER_USERNAME }}/api-gateway:latest
+      - name: Push image to Docker Hub
+        run: |
+          docker push ${{ secrets.DOCKER_USERNAME }}/api-gateway:latest
+          docker push ${{ secrets.DOCKER_USERNAME }}/api-gateway:${{ github.sha }}
 
   deploy:
     needs: build
     runs-on: self-hosted
 
     steps:
-      - name: Pull latest image
-        run: |
-          echo "Pulling new API Gateway image..."
-          docker pull ${{ secrets.DOCKER_USERNAME }}/api-gateway:latest
+      - name: Checkout code
+        uses: actions/checkout@v3
 
-      - name: Deploy service
+      - name: Apply K8s ConfigMap and Service
         run: |
-          echo "Restarting API Gateway service..."
-          cd /home/ubuntu/deploy
-          docker compose up -d api-gateway
+          kubectl apply -f deploy/k8s/api-gateway/configmap.yaml
+          kubectl apply -f deploy/k8s/api-gateway/service.yaml
+
+      - name: Deploy to Kubernetes
+        env:
+          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          envsubst < deploy/k8s/api-gateway/deployment.yaml | kubectl apply -f -
+          kubectl apply -f deploy/k8s/api-gateway/hpa.yaml
+
+      - name: Wait for rollout
+        run: |
+          kubectl rollout status deployment/api-gateway --timeout=120s
+
+      - name: Verify pods
+        run: |
+          kubectl get pods -l app=api-gateway
           echo "Deployment completed!"
