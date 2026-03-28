@@ -99,7 +99,7 @@ func registerRoutes(r *chi.Mux, cfg *config.Config) {
 	r.Get("/payments", placeholder)
 	r.Post("/payments", placeholder)
 
-	r.Get("/products", placeholder)
+	r.Get("/products1", placeholder)
 	r.Get("/products/{id}", placeholder)
 	r.Post("/products", placeholder)
 }
