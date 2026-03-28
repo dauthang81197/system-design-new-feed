@@ -3,8 +3,10 @@ name: API Gateway CI/CD
 on:
   push:
     paths:
-      - "../../services/api-gateway"
+      - "services/api-gateway/**"
 
 jobs:
-  call:
-    uses: ./deploy/cicd/api-gateway.yml
+  run_api_gateway:
+    uses: dauthang81197/system-design-new-feed/.github/workflows/api-gateway.yml@develop
+    with:
+      service_path: "services/api-gateway"
