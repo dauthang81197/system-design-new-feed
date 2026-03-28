@@ -8,7 +8,7 @@ RUN go mod download
 
 COPY . .
 
-RUN CGO_ENABLED=0 GOOS=linux go build -o api-gateway .
+RUN CGO_ENABLED=0 GOOS=linux go build -o api-gateway ./cmd/gateway
 
 # ===== STAGE 2: Runtime =====
 FROM alpine:3.19
