@@ -1,0 +1,10 @@
+name: API Gateway CI/CD
+
+on:
+  push:
+    paths:
+      - "../../services/api-gateway"
+
+jobs:
+  call:
+    uses: ./deploy/cicd/api-gateway.yml
