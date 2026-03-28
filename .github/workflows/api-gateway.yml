@@ -58,6 +58,12 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
+      - name: Configure kubeconfig
+        run: |
+          mkdir -p $HOME/.kube
+          echo "${{ secrets.KUBECONFIG }}" | base64 -d > $HOME/.kube/config
+          chmod 600 $HOME/.kube/config
+
       - name: Apply K8s ConfigMap and Service
         run: |
           kubectl apply -f deploy/k8s/api-gateway/configmap.yaml
