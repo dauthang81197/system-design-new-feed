@@ -1,75 +1,24 @@
-version: '3.9'
+version: "3.9"
 
 services:
-  # ── Auth Service ─────────────────────────────────────────────────────────────
-  auth:
-    build:
-      context: ../services/auth
-      dockerfile: Dockerfile
-    container_name: auth-service
+  api-gateway:
+    image: ${DOCKER_USERNAME}/api-gateway:latest
+    container_name: api-gateway
+    restart: always
+
     ports:
-      - '3001:3001'
+      - "4000:4000"       # public port
+
     environment:
-      NODE_ENV: production
-      PORT: 3001
-      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/auth_db
-      REDIS_HOST: redis
-      REDIS_PORT: 6379
-      JWT_ACCESS_SECRET: change_me_in_production_access
-      JWT_REFRESH_SECRET: change_me_in_production_refresh
-      ACCESS_TOKEN_TTL: 900
-      REFRESH_TOKEN_TTL: 604800
-    depends_on:
-      postgres:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
-    restart: unless-stopped
-    networks:
-      - newsfeed-net
+      PORT: 4000
+      AUTH_SERVICE_URL: "http://user-service:4001"
+      POST_SERVICE_URL: "http://post-service:4002"
+      FOLLOW_SERVICE_URL: "http://comment-service:4003"
+      NEWS_FEED_SERVICE_URL: "http://news-feed-service:4004"
 
-  # ── PostgreSQL ────────────────────────────────────────────────────────────────
-  postgres:
-    image: postgres:16-alpine
-    container_name: auth-postgres
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: auth_db
-    ports:
-      - '5432:5432'
-    volumes:
-      - postgres-data:/var/lib/postgresql/data
-    healthcheck:
-      test: ['CMD-SHELL', 'pg_isready -U postgres']
-      interval: 5s
-      timeout: 5s
-      retries: 5
     networks:
-      - newsfeed-net
-
-  # ── Redis ─────────────────────────────────────────────────────────────────────
-  redis:
-    image: redis:7-alpine
-    container_name: auth-redis
-    command: redis-server --save 60 1 --loglevel warning
-    ports:
-      - '6379:6379'
-    volumes:
-      - redis-data:/data
-    healthcheck:
-      test: ['CMD', 'redis-cli', 'ping']
-      interval: 5s
-      timeout: 3s
-      retries: 5
-    networks:
-      - newsfeed-net
-
-volumes:
-  postgres-data:
-  redis-data:
+      - system
 
 networks:
-  newsfeed-net:
+  system:
     driver: bridge
-
