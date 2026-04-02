@@ -1,0 +1,108 @@
+# ================================
+# Maven / Java
+# ================================
+target/
+!.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
+*.class
+*.jar
+*.war
+*.ear
+*.nar
+*.zip
+*.tar.gz
+*.rar
+hs_err_pid*
+replay_pid*
+
+# Maven wrapper
+.mvn/wrapper/maven-wrapper.properties
+
+# ================================
+# Go
+# ================================
+# Compiled binaries
+bin/
+dist/
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Go test output
+*.test
+*.out
+
+# Go build cache
+/vendor/
+
+# ================================
+# IDE - IntelliJ IDEA / JetBrains
+# ================================
+.idea/
+*.iws
+*.iml
+*.ipr
+out/
+.idea_modules/
+
+# ================================
+# IDE - VS Code
+# ================================
+.vscode/
+*.code-workspace
+
+# ================================
+# OS - macOS
+# ================================
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+.Spotlight-V100
+.Trashes
+
+# ================================
+# OS - Windows
+# ================================
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# ================================
+# Environment / Secrets
+# ================================
+.env
+!.env.example
+*.local
+application-local.yml
+application-local.properties
+
+# ================================
+# Logs
+# ================================
+*.log
+logs/
+
+# ================================
+# Docker
+# ================================
+.docker/
+
+# ================================
+# Spring Boot DevTools
+# ================================
+.springBeans
+
+# ================================
+# Misc / Temp
+# ================================
+*.tmp
+*.bak
+*.swp
+*.swo
+*~
+starter.tgz
+
