@@ -1,0 +1,12 @@
+spring:
+  jpa:
+    show-sql: false
+  config:
+    activate:
+      on-profile: prod
+
+logging:
+  level:
+    root: WARN
+    com.pv.template: INFO
+
